@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R_x</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --text: #152033;
+      --muted: #5f6f86;
+      --accent: #0f766e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Segoe UI, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 28%),
+        linear-gradient(180deg, #eef4fb 0%, var(--bg) 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(1100px, 100%);
+      min-height: 85vh;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(21, 32, 51, 0.08);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(21, 32, 51, 0.12);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero {
+      padding: 28px 28px 16px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .note {
+      margin: 16px 28px 28px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--panel);
+      border: 1px solid rgba(21, 32, 51, 0.08);
+      color: var(--muted);
+    }
+
+    /* Hide the Chatbase launcher bubble/button */
+    iframe[title*="chatbase"],
+    iframe[src*="chatbase.co"],
+    div[id*="chatbase-bubble"],
+    button[id*="chatbase-bubble"] {
+      transition: opacity 0.2s ease;
+    }
+
+    .hide-launcher iframe[title*="chatbase"],
+    .hide-launcher div[id*="chatbase-bubble"],
+    .hide-launcher button[id*="chatbase-bubble"] {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+<body class="hide-launcher">
+  <main class="shell">
+    <section class="hero">
+      <h1>R_x</h1>
+      <p>Your AI assistant is loading automatically.</p>
+    </section>
+    <div class="note">
+      This setup removes the floating popup icon and opens the chat directly on page load.
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+        window.chatbase = (...arguments_) => {
+          if (!window.chatbase.q) {
+            window.chatbase.q = [];
+          }
+          window.chatbase.q.push(arguments_);
+        };
+
+        window.chatbase = new Proxy(window.chatbase, {
+          get(target, prop) {
+            if (prop === "q") {
+              return target.q;
+            }
+            return (...args) => target(prop, ...args);
+          }
+        });
+      }
+
+      const onLoad = function () {
+        const script = document.createElement("script");
+        script.src = "https://www.chatbase.co/embed.min.js";
+        script.id = "_OoSwDZtwHBqr2u7iUut_";
+        script.domain = "www.chatbase.co";
+        script.onload = function () {
+          const tryOpen = () => {
+            try {
+              window.chatbase.open();
+            } catch (error) {
+              setTimeout(tryOpen, 800);
+            }
+          };
+
+          setTimeout(tryOpen, 1200);
+        };
+        document.body.appendChild(script);
+      };
+
+      if (document.readyState === "complete") {
+        onLoad();
+      } else {
+        window.addEventListener("load", onLoad);
+      }
+    })();
+  </script>
+</body>
+</html>
